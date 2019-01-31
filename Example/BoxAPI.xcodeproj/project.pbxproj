@@ -29,7 +29,7 @@
 
 /* Begin PBXFileReference section */
 		11CC37C8A277682C008E7E15 /* Pods-BoxAPI_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BoxAPI_Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BoxAPI_Example/Pods-BoxAPI_Example.debug.xcconfig"; sourceTree = "<group>"; };
-		491D83F1E975DC878EE472A8 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; name = README.md; path = ../README.md; sourceTree = "<group>"; };
+		491D83F1E975DC878EE472A8 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		607FACD01AFB9204008FA782 /* BoxAPI_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BoxAPI_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACD41AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACD51AFB9204008FA782 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -40,11 +40,11 @@
 		607FACE51AFB9204008FA782 /* BoxAPI_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BoxAPI_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACEA1AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACEB1AFB9204008FA782 /* Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
-		6713ED1F48CE6FCD26FE0F14 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
+		6713ED1F48CE6FCD26FE0F14 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		7687F005FBBE9B7E20761A92 /* Pods-BoxAPI_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BoxAPI_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BoxAPI_Tests/Pods-BoxAPI_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		7E4FF87BD70D4CD0866E0306 /* Pods-BoxAPI_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BoxAPI_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-BoxAPI_Tests/Pods-BoxAPI_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		82487AD58E554A2F044CE1E8 /* Pods_BoxAPI_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BoxAPI_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		911BB320C734623010399480 /* BoxAPI.podspec */ = {isa = PBXFileReference; includeInIndex = 1; name = BoxAPI.podspec; path = ../BoxAPI.podspec; sourceTree = "<group>"; };
+		911BB320C734623010399480 /* BoxAPI.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = BoxAPI.podspec; path = ../BoxAPI.podspec; sourceTree = "<group>"; };
 		A19043508B3F1B79DEF940BB /* Pods-BoxAPI_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BoxAPI_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-BoxAPI_Example/Pods-BoxAPI_Example.release.xcconfig"; sourceTree = "<group>"; };
 		C5D144B561F172AE384C98C3 /* Pods_BoxAPI_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BoxAPI_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -212,6 +212,7 @@
 				TargetAttributes = {
 					607FACCF1AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
+						DevelopmentTeam = 7QP29GGW45;
 						LastSwiftMigration = 0900;
 					};
 					607FACE41AFB9204008FA782 = {
@@ -271,12 +272,14 @@
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-BoxAPI_Example/Pods-BoxAPI_Example-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/BoxAPI/BoxAPI.framework",
+				"${BUILT_PRODUCTS_DIR}/ObjectMapper/ObjectMapper.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 			);
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/BoxAPI.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ObjectMapper.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -481,6 +484,7 @@
 			baseConfigurationReference = 11CC37C8A277682C008E7E15 /* Pods-BoxAPI_Example.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = 7QP29GGW45;
 				INFOPLIST_FILE = BoxAPI/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
@@ -496,6 +500,7 @@
 			baseConfigurationReference = A19043508B3F1B79DEF940BB /* Pods-BoxAPI_Example.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = 7QP29GGW45;
 				INFOPLIST_FILE = BoxAPI/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;

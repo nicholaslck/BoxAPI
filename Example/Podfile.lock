@@ -1,0 +1,23 @@
+PODS:
+  - BoxAPI (0.1.0):
+    - ObjectMapper
+  - ObjectMapper (3.4.2)
+
+DEPENDENCIES:
+  - BoxAPI (from `../`)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - ObjectMapper
+
+EXTERNAL SOURCES:
+  BoxAPI:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  BoxAPI: 36df811e4600316a81757c5245aa42558fb7fe04
+  ObjectMapper: 0d4402610f4e468903ae64629eec4784531e5c51
+
+PODFILE CHECKSUM: 6303f6ebe83c40658e5fc1527398116b67dfd49b
+
+COCOAPODS: 1.5.3
