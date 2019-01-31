@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'BoxAPI_Example' do
+  pod 'BoxAPI', :path => '../'
+
+  target 'BoxAPI_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end
