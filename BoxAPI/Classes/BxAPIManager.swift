@@ -19,11 +19,14 @@ open class BxAPIManager {
     private func performSend<T, U>( api: BoxAPI<T, U>, onReturn:((_ isSuccess: Bool) -> Void)? = nil ) where T : BxRequestProtocol, U : BxResponseProtocol {
         
         guard let url = api.request.url else {
+            api.status = .fail
             api.response = U()
             api.response!.error = bxAPIManagerError(description: "Invalid or no request url.")
             onReturn?(false)
             return
         }
+        
+        api.status = .waitingResponse
         
         let dataRequest = request(url, method: api.request.method, parameters: api.request.params, encoding: api.request.encoding, headers: api.request.customHeader)
         dataRequest.responseData { (dataResponse) in
@@ -39,6 +42,12 @@ open class BxAPIManager {
             api.response!.body = dataResponse.data
             
             let isSuccess = (api.response!.error == nil)
+            if isSuccess {
+                api.status = .success
+            }
+            else {
+                api.status = .fail
+            }
             onReturn?(isSuccess)
         }
     }

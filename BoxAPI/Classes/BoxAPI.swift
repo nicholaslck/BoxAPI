@@ -13,8 +13,8 @@ open class BoxAPI<T, U> where T : BxRequestProtocol, U : BxResponseProtocol {
     public enum Status {
         case ready
         case waitingResponse
-        case successed
-        case failed
+        case success
+        case fail
     }
     
     open var status: Status = .ready
