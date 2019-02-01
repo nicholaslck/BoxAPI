@@ -14,8 +14,19 @@ class Tests: XCTestCase {
     }
     
     func testExample() {
-        // This is an example of a functional test case.
-        XCTAssert(true, "Pass")
+        
+        let expect = XCTestExpectation(description: "cc")
+        
+        let api = TestAPI()
+        api.send { (isSuccess) in
+            XCTAssertTrue(isSuccess, "API return fail.")
+            
+            XCTAssertEqual(api.response?.json?.id, 2, "Wrong Id.")
+            
+            expect.fulfill()
+        }
+        
+        wait(for: [expect], timeout: 20)
     }
     
     func testPerformanceExample() {

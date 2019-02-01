@@ -41,4 +41,6 @@ A frameworks to call network API. Each API object can be treat send and receive 
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'
   s.dependency 'ObjectMapper'
+  s.dependency 'Alamofire'
+  
 end

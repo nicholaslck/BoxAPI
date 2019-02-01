@@ -6,27 +6,27 @@
 //
 
 import Foundation
+import ObjectMapper
 
 open class BoxAPI<T, U> where T : BxRequestProtocol, U : BxResponseProtocol {
     
-    enum Status {
+    public enum Status {
         case ready
         case waitingResponse
         case successed
         case failed
     }
     
-    var status: Status = .ready
+    open var status: Status = .ready
     
-    var request : T = T()
-    var response : U?
-}
-
-// MARK:- API actions
-public extension BoxAPI {
+    open var request : T = T()
+    open var response : U?
     
-    func send(onReturn: () -> Void) {
-        
+    public init() {
     }
     
+    open func send(onReturn: ((Bool) -> Void)? ) {
+        
+        BxAPIManager.shared.send(api: self, onReturn: onReturn)
+    }
 }
