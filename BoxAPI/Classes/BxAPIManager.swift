@@ -8,15 +8,28 @@
 import Foundation
 import Alamofire
 
+public protocol BxAPIManagerDelegate {
+    
+    func bxAPIManager<T, U>(_ manager: BxAPIManager, apiReadyToFly api: BoxAPI<T, U>) -> Bool where T : BxRequestProtocol, U : BxResponseProtocol
+    
+    func bxAPIManager<T, U>(_ manager: BxAPIManager, apiReturned api: BoxAPI<T, U>, resumeHandler: ((Bool) -> Void)? ) -> Bool where T : BxRequestProtocol, U : BxResponseProtocol
+}
+
 open class BxAPIManager {
     
     static let shared = BxAPIManager()
+    
+    var delegate: BxAPIManagerDelegate?
     
     open func send<T, U>( api: BoxAPI<T, U>, onReturn:((_ isSuccess: Bool) -> Void)? = nil ) where T : BxRequestProtocol, U : BxResponseProtocol {
         performSend(api: api, onReturn: onReturn)
     }
     
     private func performSend<T, U>( api: BoxAPI<T, U>, onReturn:((_ isSuccess: Bool) -> Void)? = nil ) where T : BxRequestProtocol, U : BxResponseProtocol {
+        
+        if !(self.delegate?.bxAPIManager(self, apiReadyToFly: api) ?? true) {
+            return
+        }
         
         guard let url = api.request.url else {
             api.status = .fail
@@ -48,7 +61,10 @@ open class BxAPIManager {
             else {
                 api.status = .fail
             }
-            onReturn?(isSuccess)
+            
+            if self.delegate?.bxAPIManager(self, apiReturned: api, resumeHandler: onReturn) ?? true {
+               onReturn?(isSuccess)
+            }
         }
     }
     
