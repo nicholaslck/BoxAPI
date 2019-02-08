@@ -28,7 +28,11 @@ class TestRequest : BxRequest {
 class TestResponse : BxJSONResponse<Test> {
 }
 
-class Test : Mappable {
+class Test : BxMandatoryMappable {
+    
+    var mandatoryProperties: [Any?] {
+        return [id, abc]
+    }
     
 //    "id": 2,
 //    "first_name": "Janet",
@@ -39,6 +43,9 @@ class Test : Mappable {
     var lastName: String!
     var avatar: URL!
     
+    var abc: TestChild!
+    var efg: [TestChild]?
+    
     required init?(map: Map) {
     }
     
@@ -47,6 +54,30 @@ class Test : Mappable {
         firstName <- map["data.first_name"]
         lastName <- map["data.last_name"]
         avatar <- map["data.avatar"]
+        
+        abc = TestChild(map: map)
+        efg = [TestChild(map: map)!]
     }
+    
+}
+
+class TestChild : BxMandatoryMappable {
+    
+    var abc: String!
+    
+    var mandatoryProperties: [Any?] {
+        return [abc]
+    }
+    
+    required init?(map: Map) {
+        
+    }
+    
+    func mapping(map: Map) {
+        
+    }
+    
+    
+    
     
 }

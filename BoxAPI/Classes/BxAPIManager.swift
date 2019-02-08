@@ -10,8 +10,21 @@ import Alamofire
 
 public protocol BxAPIManagerDelegate {
     
+    /// delegate before each api request send. Return false if this api request should be block and drop.
+    ///
+    /// - Parameters:
+    ///   - manager: BxAPIManager
+    ///   - api: BoxAPI object
+    /// - Returns: true for okay to send, else false.
     func bxAPIManager<T, U>(_ manager: BxAPIManager, apiReadyToFly api: BoxAPI<T, U>) -> Bool where T : BxRequestProtocol, U : BxResponseProtocol
     
+    /// delegate after api return and before propagate to applications.
+    ///
+    /// - Parameters:
+    ///   - manager: BxAPIManager
+    ///   - api: BoxAPI object
+    ///   - resumeHandler: a callback to application.
+    /// - Returns: false if this api response should be dropped, else return true.
     func bxAPIManager<T, U>(_ manager: BxAPIManager, apiReturned api: BoxAPI<T, U>, resumeHandler: ((Bool) -> Void)? ) -> Bool where T : BxRequestProtocol, U : BxResponseProtocol
 }
 
@@ -47,20 +60,20 @@ open class BxAPIManager {
             api.request.raw = dataRequest
             
             api.response = U()
-            
             api.response!.raw = dataResponse
             api.response!.error = dataResponse.error
             api.response!.status = dataResponse.response!.statusCode
             api.response!.headers = dataResponse.response!.allHeaderFields as! [String: Any]
             api.response!.body = dataResponse.data
             
-            let isSuccess = (api.response!.error == nil)
-            if isSuccess {
-                api.status = .success
+            var isSuccess = api.response!.error == nil
+            
+            if isSuccess, let verifyError = api.response!.verifyOnServerReturn() {
+                isSuccess = false
+                api.response!.error = verifyError
             }
-            else {
-                api.status = .fail
-            }
+            
+            api.status = isSuccess ? .success : .fail
             
             if self.delegate?.bxAPIManager(self, apiReturned: api, resumeHandler: onReturn) ?? true {
                onReturn?(isSuccess)

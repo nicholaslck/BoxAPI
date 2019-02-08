@@ -22,6 +22,8 @@ public protocol BxResponseProtocol : AnyObject {
     var headers: [String : Any] { get set }
     
     var body: Data? { get set }
+    
+    func verifyOnServerReturn() -> Error?
 }
 
 open class BxResponse : BxResponseProtocol {
@@ -38,6 +40,10 @@ open class BxResponse : BxResponseProtocol {
     
     public required init() {
         status = 0
+    }
+    
+    public func verifyOnServerReturn() -> Error? {
+        return nil
     }
 }
 
@@ -56,32 +62,17 @@ open class BxJSONResponse<J> : BxResponse, BxJSONResponseProtocol where J : Mapp
     
     /// A JSON representation of body, if body cannot convert to JSON or body is nil, it returns nil.
     open var json: J? {
-        if _json == nil {
-            
-            guard let data = body else { return nil }
-            do {
-                let jsonObject = try JSONSerialization.jsonObject(with: data, options: [])
-                
-                if let jsonDict = jsonObject as? [String : Any] {
-                    _json = Mapper<J>().map(JSON: jsonDict)
-                }
-                else if let _ = jsonObject as? [Any] {
-                    throw bxJSONResponseError(description: "Cannot parse JSON using ObjectMapper, body is a JSON array.")
-                }
-                else {
-                    throw bxJSONResponseError(description: "Cannot parse JSON using ObjectMapper, body is a single value \(String(describing: jsonObject))")
-                }
-            }
-            catch {
-                print(error)
-            }
-        }
         return _json
     }
     
     override open var body: Data? {
         didSet {
-            _json = nil
+            do {
+                try convertDataToJSON()
+            }
+            catch {
+                print(error)
+            }
         }
     }
     
@@ -94,6 +85,29 @@ open class BxJSONResponse<J> : BxResponse, BxJSONResponseProtocol where J : Mapp
          return NSError(domain: "BxJSONResponse", code: -2, userInfo: [NSLocalizedDescriptionKey: description])
     }
     
+    private func convertDataToJSON() throws {
+        guard let data = body else { return }
+        
+        let jsonObject = try JSONSerialization.jsonObject(with: data, options: [])
+        
+        guard let jsonDict = jsonObject as? [String : Any] else {
+            if let _ = jsonObject as? [Any] {
+                throw bxJSONResponseError(description: "Cannot parse JSON using ObjectMapper, body is a JSON array.")
+            }
+            else {
+                throw bxJSONResponseError(description: "Cannot parse JSON using ObjectMapper, body is a single value \(String(describing: jsonObject))")
+            }
+        }
+        _json = Mapper<J>().map(JSON: jsonDict)
+    }
+    
+    override public func verifyOnServerReturn() -> Error? {
+        
+        guard let manJson = json as? BxMandatoryMappable else {
+            return nil
+        }
+        return manJson.verify()
+    }
 }
 
 
