@@ -15,22 +15,20 @@ public protocol BxResponseProtocol : AnyObject {
     
     var raw: DataResponse<Data>? { get set }
     
-    var status: Int { get set }
+    var statusCode: Int { get set }
     
     var error: Error? { get set }
     
     var headers: [String : Any] { get set }
     
     var body: Data? { get set }
-    
-    func verifyOnServerReturn() -> Error?
 }
 
 open class BxResponse : BxResponseProtocol {
     
     open var raw: DataResponse<Data>?
     
-    open var status: Int = 0
+    open var statusCode: Int = 0
     
     open var error: Error?
     
@@ -39,11 +37,6 @@ open class BxResponse : BxResponseProtocol {
     open var body: Data?
     
     public required init() {
-        status = 0
-    }
-    
-    public func verifyOnServerReturn() -> Error? {
-        return nil
     }
 }
 
@@ -58,20 +51,28 @@ open class BxJSONResponse<J> : BxResponse, BxJSONResponseProtocol where J : Mapp
     
     public typealias JSONObjectType = J
     
-    private var _json: J?
-    
     /// A JSON representation of body, if body cannot convert to JSON or body is nil, it returns nil.
-    open var json: J? {
-        return _json
-    }
+    open private(set) var json: J?
     
     override open var body: Data? {
         didSet {
-            do {
-                try convertDataToJSON()
-            }
-            catch {
-                print(error)
+            json = nil
+            if body != nil {
+                do {
+                    json = try convertDataToJSON()
+                    
+                    if let manJson = json as? BxMandatoryMappable {
+                        if let verifyError = manJson.verify() {
+                            throw verifyError
+                        }
+                    }
+                }
+                catch {
+                    print(error)
+                    if self.error == nil {
+                        self.error = error
+                    }
+                }
             }
         }
     }
@@ -85,8 +86,9 @@ open class BxJSONResponse<J> : BxResponse, BxJSONResponseProtocol where J : Mapp
          return NSError(domain: "BxJSONResponse", code: -2, userInfo: [NSLocalizedDescriptionKey: description])
     }
     
-    private func convertDataToJSON() throws {
-        guard let data = body else { return }
+    private func convertDataToJSON() throws -> J? {
+        
+        guard let data = body else { return nil }
         
         let jsonObject = try JSONSerialization.jsonObject(with: data, options: [])
         
@@ -98,15 +100,7 @@ open class BxJSONResponse<J> : BxResponse, BxJSONResponseProtocol where J : Mapp
                 throw bxJSONResponseError(description: "Cannot parse JSON using ObjectMapper, body is a single value \(String(describing: jsonObject))")
             }
         }
-        _json = Mapper<J>().map(JSON: jsonDict)
-    }
-    
-    override public func verifyOnServerReturn() -> Error? {
-        
-        guard let manJson = json as? BxMandatoryMappable else {
-            return nil
-        }
-        return manJson.verify()
+        return J(JSON: jsonDict)
     }
 }
 

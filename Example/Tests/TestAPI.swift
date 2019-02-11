@@ -15,12 +15,18 @@ class TestAPI: BoxAPI<TestRequest, TestResponse> {
 
 class TestRequest : BxRequest {
     
+    var userId: Int = 0
+    
+    var _domain = "https://reqres.in/"
+    
+    var _action = "/api/users/"
+    
     override var domain: String {
-        return "https://reqres.in/"
+        return _domain
     }
     
     override var action: String {
-        return "/api/users/2"
+        return "\(_action)\(userId)"
     }
     
 }
@@ -31,7 +37,7 @@ class TestResponse : BxJSONResponse<Test> {
 class Test : BxMandatoryMappable {
     
     var mandatoryProperties: [Any?] {
-        return [id, abc]
+        return []
     }
     
 //    "id": 2,
@@ -43,9 +49,6 @@ class Test : BxMandatoryMappable {
     var lastName: String!
     var avatar: URL!
     
-    var abc: TestChild!
-    var efg: [TestChild]?
-    
     required init?(map: Map) {
     }
     
@@ -54,30 +57,6 @@ class Test : BxMandatoryMappable {
         firstName <- map["data.first_name"]
         lastName <- map["data.last_name"]
         avatar <- map["data.avatar"]
-        
-        abc = TestChild(map: map)
-        efg = [TestChild(map: map)!]
     }
-    
-}
-
-class TestChild : BxMandatoryMappable {
-    
-    var abc: String!
-    
-    var mandatoryProperties: [Any?] {
-        return [abc]
-    }
-    
-    required init?(map: Map) {
-        
-    }
-    
-    func mapping(map: Map) {
-        
-    }
-    
-    
-    
     
 }

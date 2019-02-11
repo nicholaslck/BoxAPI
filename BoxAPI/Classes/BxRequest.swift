@@ -23,18 +23,21 @@ public protocol BxRequestProtocol : AnyObject {
     var params: [String: Any] { get }
     
     var customHeader: [String: String] { get }
+    
+    var encoding: ParameterEncoding { get }
 }
 
 public extension BxRequestProtocol {
     
     var url: URL? {
         
+        guard let domainUrl = URL(string: self.domain) else {
+            return nil
+        }
+        
         var domain = self.domain
         if domain.last != "/" {
             domain = "\(domain)/"
-        }
-        guard let domainUrl = URL(string: domain) else {
-            return nil
         }
         
         var action = self.action
@@ -49,32 +52,28 @@ public extension BxRequestProtocol {
         
         return domainUrl.appendingPathComponent(action)
     }
-    
-    var encoding: ParameterEncoding {
-        
-        switch method {
-        case .post, .put:
-            return JSONEncoding()
-        default:
-            return URLEncoding()
-        }
-    }
 }
 
 open class BxRequest : BxRequestProtocol {
     
+    open var raw: DataRequest?
+    
+    /// Override this value if needed, default is GET.
     open var method: HTTPMethod {
         return .get
     }
     
+    /// Override this value to config domain. e.g. For api "GET https://www.example.com/users/2", domain is "https://www.example.com"
     open var domain: String {
-        return BxAPIEnvironment.shared.domain
+        return ""
     }
     
+    /// Override this value to config action or path after domain. e.g. For api "GET https://www.example.com/users/2", action is "users/2"
     open var action: String {
         return ""
     }
     
+    /// Override this method to assign params in request.
     open var params: [String: Any] {
         return [:]
     }
@@ -83,7 +82,16 @@ open class BxRequest : BxRequestProtocol {
         return [:]
     }
     
-    open var raw: DataRequest?
+    /// Override this value if needed, default for POST and PUT will return JSONEncoding.default, else URLEncoding.default
+    open var encoding: ParameterEncoding {
+        
+        switch method {
+        case .post, .put:
+            return JSONEncoding.default
+        default:
+            return URLEncoding.default
+        }
+    }
     
     public required init() {
     }

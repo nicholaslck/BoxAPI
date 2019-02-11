@@ -30,22 +30,18 @@ public protocol BxAPIManagerDelegate {
 
 open class BxAPIManager {
     
-    static let shared = BxAPIManager()
+    public static let shared = BxAPIManager()
     
     var delegate: BxAPIManagerDelegate?
     
     open func send<T, U>( api: BoxAPI<T, U>, onReturn:((_ isSuccess: Bool) -> Void)? = nil ) where T : BxRequestProtocol, U : BxResponseProtocol {
-        performSend(api: api, onReturn: onReturn)
-    }
-    
-    private func performSend<T, U>( api: BoxAPI<T, U>, onReturn:((_ isSuccess: Bool) -> Void)? = nil ) where T : BxRequestProtocol, U : BxResponseProtocol {
         
         if !(self.delegate?.bxAPIManager(self, apiReadyToFly: api) ?? true) {
             return
         }
         
         guard let url = api.request.url else {
-            api.status = .fail
+            api.status = .failed
             api.response = U()
             api.response!.error = bxAPIManagerError(description: "Invalid or no request url.")
             onReturn?(false)
@@ -54,29 +50,32 @@ open class BxAPIManager {
         
         api.status = .waitingResponse
         
-        let dataRequest = request(url, method: api.request.method, parameters: api.request.params, encoding: api.request.encoding, headers: api.request.customHeader)
+        var dataRequest = request(
+            url,
+            method: api.request.method,
+            parameters: api.request.params,
+            encoding: api.request.encoding,
+            headers: api.request.customHeader
+        )
+        dataRequest = dataRequest.validate()
         dataRequest.responseData { (dataResponse) in
             
             api.request.raw = dataRequest
             
+            // Begin setup response.
             api.response = U()
             api.response!.raw = dataResponse
             api.response!.error = dataResponse.error
-            api.response!.status = dataResponse.response!.statusCode
-            api.response!.headers = dataResponse.response!.allHeaderFields as! [String: Any]
+            api.response!.statusCode = dataResponse.response?.statusCode ?? 0
+            api.response!.headers = (dataResponse.response?.allHeaderFields ?? [:]) as! [String: Any]
             api.response!.body = dataResponse.data
             
-            var isSuccess = api.response!.error == nil
-            
-            if isSuccess, let verifyError = api.response!.verifyOnServerReturn() {
-                isSuccess = false
-                api.response!.error = verifyError
-            }
-            
-            api.status = isSuccess ? .success : .fail
+            // Finishing status
+            let isSuccess = api.response!.error == nil
+            api.status = isSuccess ? .succeed : .failed
             
             if self.delegate?.bxAPIManager(self, apiReturned: api, resumeHandler: onReturn) ?? true {
-               onReturn?(isSuccess)
+                onReturn?(isSuccess)
             }
         }
     }

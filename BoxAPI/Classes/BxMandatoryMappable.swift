@@ -19,9 +19,10 @@ public extension BxMandatoryMappable {
         
         var error: Error? = nil
         
+        // Check self mandatory field is empty or not.
         for (index, value) in mandatoryProperties.enumerated() {
             if value == nil {
-                let thisError = bxMandatoryMappableError(description: "Value at mandatory mapping index \(index) in nil.")
+                let thisError = bxMandatoryMappableError(description: "Value at index \(index) in mandatoryProperties in class \(type(of: self)) should not be nil.")
                 print(thisError)
                 if error == nil {
                     error = thisError
@@ -29,43 +30,38 @@ public extension BxMandatoryMappable {
             }
         }
         
+        // Recursice verify all children.
         let mi = Mirror(reflecting: self)
         for child in mi.children {
-            let name = child.label ?? ""
-            var value: Any? = child.value
             
+            let name = child.label ?? ""
+            var value: Any?
+            
+            // Unwrapped value from Child format.
             let childMi = Mirror(reflecting: child.value)
-            if childMi.displayStyle == .optional {
-                if let (_, some) = childMi.children.first {
-                    value = some
-                }
-                else {
-                    value = nil
-                }
+            if childMi.displayStyle == .optional , let (_, some) = childMi.children.first {
+                value = some
             }
             
-            var childOk = true
-            
-            let recursiveBlock: ((BxMandatoryMappable) -> Void) = { (manValue) in
+            if let manValue = value as? BxMandatoryMappable {
+                // Verify child if it is single BxMandatoryMappable child
                 if let thisError = manValue.verify() {
-                    childOk = false
+                    print(bxMandatoryMappableError(description: "Child property \(name) in object class \(type(of: self)) does not fullfill mandatoryProperties."))
                     if error == nil {
                         error = thisError
                     }
                 }
             }
-            
-            if let manValue = value as? BxMandatoryMappable {
-                recursiveBlock(manValue)
-            }
             else if let manValues = value as? [BxMandatoryMappable] {
-                for manValue in manValues {
-                    recursiveBlock(manValue)
+                // Verify child if it is array of BxMandatoryMappable child
+                for (index, manValue) in manValues.enumerated() {
+                    if let thisError = manValue.verify() {
+                        print(bxMandatoryMappableError(description: "Value at index \(index) of child property \(name) in object class \(type(of: self)) does not fullfill mandatoryProperties."))
+                        if error == nil {
+                            error = thisError
+                        }
+                    }
                 }
-            }
-            
-            if !childOk {
-                print(bxMandatoryMappableError(description: "Child property \(name) in object class \(type(of: self)) does not fullfill mandatory properties."))
             }
         }
         return error
@@ -73,6 +69,6 @@ public extension BxMandatoryMappable {
     
     private func bxMandatoryMappableError(description: String) -> NSError {
         
-        return NSError(domain: "\(Mirror(reflecting: self).subjectType)" , code: -3, userInfo: [NSLocalizedDescriptionKey: description])
+        return NSError(domain: "\(type(of: self))" , code: -3, userInfo: [NSLocalizedDescriptionKey: description])
     }
 }

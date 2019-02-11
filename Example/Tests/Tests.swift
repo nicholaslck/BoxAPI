@@ -13,27 +13,76 @@ class Tests: XCTestCase {
         super.tearDown()
     }
     
-    func testExample() {
+    func testBasicResponseContentsWhenAPIReturnsSuccess() {
         
-        let expect = XCTestExpectation(description: "cc")
+        let expect = XCTestExpectation(description: "timeout")
         
         let api = TestAPI()
+        api.request.userId = 2
         api.send { (isSuccess) in
-            XCTAssertTrue(isSuccess, "API return fail.")
-            
-            XCTAssertEqual(api.response?.json?.id, 2, "Wrong Id.")
-            
             expect.fulfill()
+            
+            XCTAssertNotNil(api.request.raw)
+            
+            XCTAssertTrue(isSuccess)
+            
+            XCTAssertNotNil(api.response)
+            
+            let resp = api.response
+            
+            XCTAssertEqual(api.status, .succeed)
+            XCTAssertNotNil(resp?.raw)
+            XCTAssertEqual(resp?.statusCode, 200)
+            XCTAssertNotNil(resp?.headers)
+            XCTAssertNotNil(resp?.body)
+            
+            XCTAssertNil(resp?.error)
         }
+        wait(for: [expect], timeout: 30)
+    }
+    
+    func testBasicResponseContentsWhenAPIReturnsFail() {
         
-        wait(for: [expect], timeout: 20)
-    }
-    
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measure() {
-            // Put the code you want to measure the time of here.
+        let expect = XCTestExpectation(description: "timeout")
+        
+        let api = TestAPI()
+        api.request.userId = 123456789
+        api.send { (isSuccess) in
+            expect.fulfill()
+            
+            XCTAssertNotNil(api.request.raw)
+            
+            XCTAssertFalse(isSuccess)
+            
+            XCTAssertNotNil(api.response)
+            
+            let resp = api.response
+            
+            XCTAssertEqual(api.status, .failed)
+            XCTAssertNotNil(resp?.raw)
+            XCTAssertEqual(resp?.statusCode, 404)
+            XCTAssertNotNil(resp?.headers)
+            XCTAssertNotNil(resp?.body)
+            
+            XCTAssertNotNil(resp?.error)
+            print(resp?.error ?? "")
         }
+        wait(for: [expect], timeout: 30)
     }
     
+    func testExitWhenAPIURLIsInvalid() {
+        
+        let expect = XCTestExpectation(description: "timeout")
+        
+        let api = TestAPI()
+        api.request._domain = "abc"
+        
+        api.send { (isSuccess) in
+            expect.fulfill()
+            XCTAssertFalse(isSuccess)
+            XCTAssertNotNil(api.response)
+            XCTAssertNotNil(api.response?.error)
+        }
+        wait(for: [expect], timeout: 30)
+    }
 }

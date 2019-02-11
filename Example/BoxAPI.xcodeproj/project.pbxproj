@@ -119,7 +119,6 @@
 			isa = PBXGroup;
 			children = (
 				607FACEB1AFB9204008FA782 /* Tests.swift */,
-				AC4FFC6C2204480B00770DE5 /* TestAPI.swift */,
 				607FACE91AFB9204008FA782 /* Supporting Files */,
 			);
 			path = Tests;
@@ -128,6 +127,7 @@
 		607FACE91AFB9204008FA782 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				ACA8159522113F0D00C2FCA0 /* API */,
 				607FACEA1AFB9204008FA782 /* Info.plist */,
 			);
 			name = "Supporting Files";
@@ -152,6 +152,14 @@
 				7E4FF87BD70D4CD0866E0306 /* Pods-BoxAPI_Tests.release.xcconfig */,
 			);
 			name = Pods;
+			sourceTree = "<group>";
+		};
+		ACA8159522113F0D00C2FCA0 /* API */ = {
+			isa = PBXGroup;
+			children = (
+				AC4FFC6C2204480B00770DE5 /* TestAPI.swift */,
+			);
+			name = API;
 			sourceTree = "<group>";
 		};
 		D67E820B4FDAA40C6A631211 /* Frameworks */ = {
