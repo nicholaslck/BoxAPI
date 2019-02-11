@@ -32,7 +32,7 @@ open class BxAPIManager {
     
     public static let shared = BxAPIManager()
     
-    var delegate: BxAPIManagerDelegate?
+    public var delegate: BxAPIManagerDelegate?
     
     open func send<T, U>( api: BoxAPI<T, U>, onReturn:((_ isSuccess: Bool) -> Void)? = nil ) where T : BxRequestProtocol, U : BxResponseProtocol {
         
