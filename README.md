@@ -22,7 +22,7 @@ pod 'BoxAPI'
 
 ## Author
 
-Nicholas Lau, nicholas.ck.lau@gtomato.com
+Nicholas Lau, nicholaslck@gmail.com
 
 ## License
 
